@@ -16,6 +16,9 @@ connectDB();
 // Initializing app
 const app = express();
 
+// Body parser
+app.use(express.json());
+
 // Dev request logger
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
