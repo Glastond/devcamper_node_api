@@ -2,21 +2,41 @@ const Bootcamp = require("../models/Bootcamps");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const geocoder = require("../utils/geocoder");
+const { Query } = require("mongoose");
 
 // @desc    Get all bootcamps.
 // @route   GET /api/v1/bootcamps
 // @access  Public
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
   let query;
-  let queryStr = JSON.stringify(req.query);
 
+  const reqQuery = { ...req.query };
+
+  // Fields to Exclude.
+  const removeFields = ["select"];
+
+  // Loop over removeFields and delete fields from the reqQuery.
+  removeFields.forEach((param) => delete reqQuery[param]);
+
+  // Create query string
+  let queryStr = JSON.stringify(reqQuery);
+
+  // Create operators ($gt,$gte,etc.)
   queryStr = queryStr.replace(
     /\b(gt|gte|lt|lte|in)\b/g,
     (match) => `$${match}`
   );
 
+  // Finding resourses
   query = Bootcamp.find(JSON.parse(queryStr));
 
+  // Select fields
+  if (req.query.select) {
+    const fields = req.query.select.split(",").join(" ");
+    query = query.select(fields);
+  }
+
+  // Executing query
   const bootcamps = await query;
 
   res.status(200).json({
