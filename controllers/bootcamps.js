@@ -13,7 +13,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   const reqQuery = { ...req.query };
 
   // Fields to Exclude.
-  const removeFields = ["select"];
+  const removeFields = ["select", "sort"];
 
   // Loop over removeFields and delete fields from the reqQuery.
   removeFields.forEach((param) => delete reqQuery[param]);
@@ -34,6 +34,14 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   if (req.query.select) {
     const fields = req.query.select.split(",").join(" ");
     query = query.select(fields);
+  }
+
+  // Sorting fields
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort("-createdAt");
   }
 
   // Executing query
