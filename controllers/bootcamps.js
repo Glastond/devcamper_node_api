@@ -1,3 +1,4 @@
+const path = require("path");
 const Bootcamp = require("../models/Bootcamps");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
@@ -133,7 +134,7 @@ exports.UpdateBootcamp = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Delete new bootcamp.
+// @desc    Delete bootcamp.
 // @route   DELETE /api/v1/bootcamps/:id
 // @access  Private
 exports.DeleteBootcamp = asyncHandler(async (req, res, next) => {
@@ -181,5 +182,59 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
     success: true,
     count: bootcamps.length,
     data: bootcamps,
+  });
+});
+
+// @desc    Upload photo for bootcamp.
+// @route   PUT /api/v1/bootcamps/:id/photo
+// @access  Private
+exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
+  const bootcamp = await Bootcamp.findById(req.params.id);
+
+  // Checking if the Bootcamp exists.
+  if (!bootcamp) {
+    return next(
+      new ErrorResponse(`Bootcamp not found with ID of ${req.params.id}`, 404)
+    );
+  }
+
+  if (!req.files) {
+    return next(new ErrorResponse(`Please upload a file`, 400));
+  }
+
+  const file = req.files.file;
+
+  // Make sure the file is a Photo.
+  if (!file.mimetype.startsWith("image")) {
+    return next(new ErrorResponse(`Please upload an Image file.`, 400));
+  }
+
+  // Check file size.
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
+    return next(
+      new ErrorResponse(
+        `Please upload an Image less than ${process.env.MAX_FILE_UPLOAD}.`,
+        400
+      )
+    );
+  }
+
+  // Create custom file name.
+  file.name = `${path.parse(file.name).name}_${bootcamp._id}${
+    path.parse(file.name).ext
+  }`;
+
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+    if (err) {
+      console.log(err);
+      return next(new ErrorResponse(`problem with file upload`, 500));
+    }
+
+    await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name });
+
+    res.status(200).json({
+      success: true,
+      data: file.name,
+    });
   });
 });
