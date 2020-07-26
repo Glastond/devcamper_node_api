@@ -28,7 +28,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   );
 
   // Finding resourses
-  query = Bootcamp.find(JSON.parse(queryStr));
+  query = Bootcamp.find(JSON.parse(queryStr)).populate("courses");
 
   // Select fields
   if (req.query.select) {
@@ -137,7 +137,7 @@ exports.UpdateBootcamp = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/bootcamps/:id
 // @access  Private
 exports.DeleteBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+  const bootcamp = await Bootcamp.findById(req.params.id);
 
   // Checking if the Bootcamp exists.
   if (!bootcamp) {
@@ -145,6 +145,10 @@ exports.DeleteBootcamp = asyncHandler(async (req, res, next) => {
       new ErrorResponse(`Bootcamp not found with ID of ${req.params.id}`, 404)
     );
   }
+
+  // The bootcamp is removed this way and findByIdAndDelete because the
+  // cascade delete method for removing the related course won't work.
+  bootcamp.remove();
 
   res.status(200).json({
     success: true,
