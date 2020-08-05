@@ -3,7 +3,6 @@ const Bootcamp = require("../models/Bootcamps");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const geocoder = require("../utils/geocoder");
-const { Query } = require("mongoose");
 
 // @desc    Get all bootcamps.
 // @route   GET /api/v1/bootcamps
