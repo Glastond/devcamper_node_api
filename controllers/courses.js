@@ -10,7 +10,7 @@ const Bootcamp = require("../models/Bootcamps");
 // @access  Public
 exports.getCourses = asyncHandler(async (req, res, next) => {
   if (req.params.bootcampId) {
-    const courses = Course.find({
+    const courses = await Course.find({
       bootcamp: req.params.bootcampId,
     });
 

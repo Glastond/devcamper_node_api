@@ -10,13 +10,13 @@ const {
 } = require("../controllers/bootcamps");
 
 const Bootcamp = require("../models/Bootcamps");
-const advancedResults = require("../middleware/advancedResult");
 
 // Include other resourses router.
 const courseRouter = require("./courses");
 
 const router = express.Router();
 
+const advancedResults = require("../middleware/advancedResult");
 // Route Protection.
 const { protect, authorize } = require("../middleware/auth");
 
