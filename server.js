@@ -8,6 +8,7 @@ const errorHandler = require("./middleware/error");
 const fileupload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
 
 // Load env file
 dotenv.config({ path: "./config/config.env" });
@@ -30,6 +31,9 @@ app.use(express.json());
 
 // Sanitize data
 app.use(mongoSanitize());
+
+// Set security headers
+app.use(helmet());
 
 // Adding cookie parser
 app.use(cookieParser());
