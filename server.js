@@ -12,6 +12,7 @@ const helmet = require("helmet");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const rateLimit = require("express-rate-limit");
+const cors = require("cors");
 
 // Load env file
 dotenv.config({ path: "./config/config.env" });
@@ -52,6 +53,9 @@ app.use(limiter);
 
 // Prevent HTTP param pollution (HPP).
 app.use(hpp());
+
+// Enable CORS
+app.use(cors());
 
 // Adding cookie parser
 app.use(cookieParser());
